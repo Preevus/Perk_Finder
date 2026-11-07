@@ -1,0 +1,3 @@
+## 2026-11-07 - Accessible Combobox Keyboard & ARIA Patterns
+**Learning:** Custom dropdown/combobox components often miss ARIA combobox/listbox roles, options semantics, and Escape-to-dismiss keyboard interactions, stranding keyboard-only and screen reader users inside the input or without focus restoration to the trigger button.
+**Action:** When implementing custom select/combobox controls, always provide `role="combobox"` on the trigger with `aria-haspopup="listbox"`, `aria-expanded`, and `aria-controls`, paired with `role="listbox"`, `role="option"`, `aria-selected`, and an Escape key handler that closes the dropdown and returns focus to the trigger.
