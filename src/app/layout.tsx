@@ -16,8 +16,14 @@ export default function RootLayout({
   return (
     <html lang="en-AU">
       <body className="min-h-screen flex flex-col bg-background text-stone-900 antialiased selection:bg-emerald-500 selection:text-white">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-emerald-700 focus:text-white focus:rounded-xl focus:shadow-lg focus:font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-600 transition-all"
+        >
+          Skip to main content
+        </a>
         <Navbar />
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        <main id="main-content" tabIndex={-1} className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 focus:outline-none">
           {children}
         </main>
         <MathModal />
