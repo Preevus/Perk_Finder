@@ -19,19 +19,30 @@ export function MerchantCombobox({
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const containerRef = React.useRef<HTMLDivElement>(null);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
 
   const selectedMerchant = merchants.find((m) => m.id === selectedId);
 
-  // Close when clicking outside
+  // Close when clicking outside or pressing Escape
   React.useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape" && open) {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
+    }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
 
   const filtered = merchants.filter((m) => {
     const q = search.toLowerCase();
@@ -45,7 +56,13 @@ export function MerchantCombobox({
   return (
     <div ref={containerRef} className={cn("relative w-full", className)}>
       <button
+        ref={triggerRef}
         type="button"
+        role="combobox"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls="merchant-listbox"
+        aria-label="Select merchant"
         onClick={() => setOpen(!open)}
         className="flex h-12 w-full items-center justify-between rounded-2xl border border-stone-200 bg-white px-4 py-2 text-sm text-stone-900 shadow-sm hover:border-emerald-500 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 transition-colors"
       >
@@ -78,7 +95,8 @@ export function MerchantCombobox({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search Woolies, 7-Eleven, Apple, Bunnings, BP..."
-              className="h-9 w-full bg-transparent text-sm placeholder:text-stone-400 focus:outline-none dark:text-stone-100"
+              aria-label="Search merchants"
+              className="h-9 w-full bg-transparent text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none dark:text-stone-100"
               autoFocus
             />
           </div>
@@ -86,9 +104,14 @@ export function MerchantCombobox({
           <div className="h-px bg-stone-100 dark:bg-stone-800 mb-1" />
 
           {/* List items */}
-          <div className="max-h-64 overflow-y-auto space-y-1 pr-1">
+          <div
+            id="merchant-listbox"
+            role="listbox"
+            aria-label="Merchants"
+            className="max-h-64 overflow-y-auto space-y-1 pr-1"
+          >
             {filtered.length === 0 ? (
-              <div className="p-4 text-center text-xs text-stone-600">
+              <div className="p-4 text-center text-xs text-stone-600" role="status">
                 No matching Australian merchant found.
               </div>
             ) : (
@@ -98,13 +121,16 @@ export function MerchantCombobox({
                   <button
                     key={m.id}
                     type="button"
+                    role="option"
+                    aria-selected={isSelected}
                     onClick={() => {
                       onSelect(m.id);
                       setOpen(false);
                       setSearch("");
+                      triggerRef.current?.focus();
                     }}
                     className={cn(
-                      "flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm text-left transition-colors",
+                      "flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
                       isSelected
                         ? "bg-emerald-50 text-emerald-950 font-semibold dark:bg-emerald-950/40 dark:text-emerald-200"
                         : "hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-200"
